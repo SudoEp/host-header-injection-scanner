@@ -62,7 +62,7 @@ def run_curl(domain, injected_host):
 def main():
     parser = argparse.ArgumentParser(description="🌐 Host Header Injection Tester with Curl-style Output + Command Echo")
     parser.add_argument("file", help="Path to file with list of domains")
-    parser.add_argument("--host", default="securelayer7.net", help="Injected Host header (default: securelayer7.net)")
+    parser.add_argument("--host", default="evil.com", help="Injected Host header (default: evil.com)")
     parser.add_argument("--output", help="Optional output file to save results")
 
     args = parser.parse_args()
