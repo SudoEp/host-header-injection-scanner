@@ -29,7 +29,6 @@ def extract_status_line(output):
 
 def run_curl(domain, injected_host):
     results = ""
-
     urls = [
         ("https://" + domain.lstrip("http://").lstrip("https://"), "HTTPS"),
         ("http://" + domain.lstrip("http://").lstrip("https://"), "HTTP")
@@ -41,14 +40,18 @@ def run_curl(domain, injected_host):
                 "curl", "-i", "-k", url,
                 "-H", f"Host: {injected_host}"
             ]
+            cmd_str = " ".join(cmd)
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
-            header = f"\n{Fore.CYAN}{'='*10} {scheme} REQUEST TO {url} {'='*10}{Style.RESET_ALL}"
             status_line = extract_status_line(result.stdout)
             status_code = status_line.split()[1] if len(status_line.split()) > 1 else "N/A"
             colored_status = get_status_color(status_code)
 
-            summary = f"{Fore.MAGENTA}[i] Status: {colored_status} | Host: {injected_host}{Style.RESET_ALL}\n"
-            results += header + "\n" + summary + result.stdout + "\n"
+            results += (
+                f"\n{Fore.CYAN}{'='*10} {scheme} REQUEST TO {url} {'='*10}{Style.RESET_ALL}\n"
+                f"{Fore.MAGENTA}{Style.BRIGHT}$ {cmd_str}{Style.RESET_ALL}\n"
+                f"{Fore.MAGENTA}[i] Status: {colored_status} | Host: {injected_host}{Style.RESET_ALL}\n"
+                f"{result.stdout}\n"
+            )
         except subprocess.TimeoutExpired:
             results += f"\n{Fore.LIGHTBLACK_EX}[!] Timeout expired for {url}{Style.RESET_ALL}\n"
         except Exception as e:
@@ -57,9 +60,9 @@ def run_curl(domain, injected_host):
     return results
 
 def main():
-    parser = argparse.ArgumentParser(description="🌐 Host Header Injection Tester with Sexy Output")
+    parser = argparse.ArgumentParser(description="🌐 Host Header Injection Tester with Curl-style Output + Command Echo")
     parser.add_argument("file", help="Path to file with list of domains")
-    parser.add_argument("--host", default="evil.com", help="Injected Host header (default: evil.com)")
+    parser.add_argument("--host", default="securelayer7.net", help="Injected Host header (default: securelayer7.net)")
     parser.add_argument("--output", help="Optional output file to save results")
 
     args = parser.parse_args()
